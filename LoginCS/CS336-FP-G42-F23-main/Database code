@@ -1,0 +1,250 @@
+-- Create Airline Table
+CREATE TABLE Airline (
+    Airline_ID VARCHAR(2) PRIMARY KEY,
+    Airline_Name VARCHAR(50) NOT NULL
+);
+
+-- Create Airport Table
+CREATE TABLE Airport (
+    Airport_ID VARCHAR(3) PRIMARY KEY,
+    Airport_Name VARCHAR(50) NOT NULL
+);
+
+-- Create Aircraft Table
+CREATE TABLE Aircraft (
+    Number_of_Seats INT PRIMARY KEY,
+    Days_Of_Operation VARCHAR(255) -- Multivalued attribute
+);
+
+
+-- Create Flight Table
+CREATE TABLE Flight (
+    Flight_Number INT NOT NULL,
+    Airline_ID VARCHAR(2) NOT NULL,
+    Number_of_Seats INT NOT NULL,
+    Departure_Airport_ID VARCHAR(3) NOT NULL,
+    Arrival_Airport_ID VARCHAR(3) NOT NULL,
+    Departing_Time DATETIME NOT NULL,
+    Arrival_Time DATETIME NOT NULL,
+    Flight_Type VARCHAR(20) NOT NULL,
+    PRIMARY KEY(Flight_Number,Airline_ID),
+    FOREIGN KEY (Airline_ID) REFERENCES Airline (Airline_ID),
+    FOREIGN KEY (Number_of_Seats) REFERENCES Aircraft (Number_of_Seats),
+    FOREIGN KEY (Departure_Airport_ID) REFERENCES Airport (Airport_ID),
+    FOREIGN KEY (Arrival_Airport_ID) REFERENCES Airport (Airport_ID)
+);
+
+-- Create Account Table
+CREATE TABLE Account (
+    User_Name VARCHAR(50) PRIMARY KEY,
+    Password VARCHAR(50) NOT NULL,
+    Type VARCHAR(25) NOT NULL
+);
+
+-- Create Customer Table
+CREATE TABLE Customer (
+    Customer_Name VARCHAR(50) NOT NULL,
+    User_Name VARCHAR(50) PRIMARY KEY,
+    FOREIGN KEY (User_Name) REFERENCES Account (User_Name)
+);
+
+CREATE TABLE FlightTicket (
+    Ticket_ID INT PRIMARY KEY,
+    User_Name VARCHAR(50) NOT NULL,
+    Purchase_Time_Date DATETIME NOT NULL,
+    Booking_Fee INT NOT NULL,
+    Total_Fare INT NOT NULL,
+    First_Name VARCHAR(50) NOT NULL,
+    Last_Name VARCHAR(50) NOT NULL,
+    ID_Number INT NOT NULL,
+    Class VARCHAR(20) NOT NULL,
+    Stops INT NOT NULL, -- Number of stops
+    Departure_Airport_ID VARCHAR(3) NOT NULL,
+    Arrival_Airport_ID VARCHAR(3) NOT NULL,
+    Departure_Date_Time DATETIME NOT NULL,
+    Arrival_Date_Time DATETIME NOT NULL,
+    Seat_Number CHAR(3) NOT NULL,
+    Travel_Type VARCHAR(20) NOT NULL, -- Travel type (e.g., one-way, round-trip)
+    Flight_Number INT NOT NULL, -- Flight number
+    Airline_ID VARCHAR(2) NOT NULL,
+    Changeable BOOLEAN NOT NULL, -- Indicates whether the ticket can be changed
+    Flight_Details VARCHAR(255) NOT NULL, -- Use an appropriate length for your needs
+
+    FOREIGN KEY (User_Name) REFERENCES Customer (User_Name),
+    FOREIGN KEY (Departure_Airport_ID) REFERENCES Airport (Airport_ID),
+    FOREIGN KEY (Arrival_Airport_ID) REFERENCES Airport (Airport_ID),
+    FOREIGN KEY (Flight_Number, Airline_ID) REFERENCES Flight (Flight_Number, Airline_ID)
+);
+
+-- Create AssociatedWith Table
+CREATE TABLE AssociatedWith (
+    Airline_ID VARCHAR(2) NOT NULL,
+    Airport_ID VARCHAR(3) NOT NULL,
+    PRIMARY KEY (Airline_ID, Airport_ID),
+    FOREIGN KEY (Airline_ID) REFERENCES Airline (Airline_ID),
+    FOREIGN KEY (Airport_ID) REFERENCES Airport (Airport_ID)
+);
+
+-- Create Reserves Table
+CREATE TABLE Reserves (
+    Airline_ID VARCHAR(2) NOT NULL,
+    Ticket_ID INT NOT NULL,
+    Seat_Number CHAR(3) NOT NULL,
+    Flight_Number INT NOT NULL,
+     PRIMARY KEY (Airline_ID,Ticket_ID, Flight_Number),
+    FOREIGN KEY (Ticket_ID) REFERENCES FlightTicket(Ticket_ID),
+    FOREIGN KEY (Flight_Number, Airline_ID) REFERENCES Flight(Flight_Number, Airline_ID)
+);
+
+-- Create Owns Table
+CREATE TABLE Owns (
+    Airline_ID VARCHAR(2) NOT NULL,
+    Number_of_Seats INT NOT NULL,
+    PRIMARY KEY (Airline_ID, Number_of_Seats),
+    FOREIGN KEY (Airline_ID) REFERENCES Airline (Airline_ID),
+    FOREIGN KEY (Number_of_Seats) REFERENCES Aircraft (Number_of_Seats)
+);
+
+
+
+
+
+
+
+
+
+-- Insert into Airline Table
+INSERT INTO Airline (Airline_ID, Airline_Name) VALUES
+('AA', 'American Airlines'),
+('UA', 'United Airlines'),
+('DL', 'Delta Air Lines'),
+('SW', 'Southwest Airlines'),
+('JB', 'JetBlue Airways');
+
+-- Insert into Airport Table
+INSERT INTO Airport (Airport_ID, Airport_Name) VALUES
+('EWR', 'Newark Liberty International Airport'),
+('LGA', 'LaGuardia Airport'),
+('JFK', 'John F. Kennedy International Airport'),
+('ATL', 'Hartsfield-Jackson Atlanta International Airport'),
+('ORD', 'O Hare International Airport'),
+('DFW', 'Dallas/Fort Worth International Airport');
+
+-- Insert into Aircraft Table
+INSERT INTO Aircraft ( Number_of_Seats, Days_Of_Operation) VALUES
+(150,'Monday, Tuesday, Wednesday'),
+(200,'Thursday,Friday'),
+(180,'Wednesday, Thursday'),
+(160, 'Tuesday, Friday'),
+(190, 'Monday, Thursday, Friday');
+
+-- Insert into AssociatedWith Table
+INSERT INTO AssociatedWith (Airline_ID, Airport_ID) VALUES
+('AA', 'EWR'),
+('UA', 'LGA'),
+('DL', 'JFK'),
+('SW', 'ATL'),
+('JB', 'ORD');
+
+-- Insert into Owns Table
+INSERT INTO Owns (Airline_ID, Number_of_Seats) VALUES
+('AA', 150),
+('UA', 200),
+('DL', 180),
+('SW', 160),
+('JB', 190);
+
+
+
+
+-- Insert into Flight Table
+INSERT INTO Flight (Flight_Number, Airline_ID, Number_of_Seats, Departure_Airport_ID, Arrival_Airport_ID, Departing_Time, Arrival_Time, Flight_Type) VALUES
+(1001, 'AA', 150, 'EWR', 'LGA', '2023-12-01 08:00:00', '2023-12-01 09:00:00', 'Domestic'),
+(1002, 'UA', 200, 'LGA', 'JFK', '2023-12-02 09:00:00', '2023-12-02 10:00:00', 'International'),
+(1003, 'DL', 180, 'JFK', 'EWR', '2023-12-03 10:00:00', '2023-12-03 11:00:00', 'Domestic'),
+(1004, 'SW', 160, 'ATL', 'ORD', '2023-12-04 11:00:00', '2023-12-04 12:00:00', 'Domestic'),
+(1005, 'JB', 190, 'ORD', 'DFW', '2023-12-05 12:00:00', '2023-12-05 13:00:00', 'International');
+
+
+
+-- Insert into Account Table
+INSERT INTO Account (User_Name, Password, Type) VALUES
+('bear', 'lion123', 'Customer'),
+('tiger', 'elephant456', 'Admin'),
+('giraffe', 'zebra789', 'Customer'),
+('panda', 'koala123', 'Staff'),
+('kangaroo', 'koala456', 'Customer');
+
+-- Insert into Customer Table
+INSERT INTO Customer (Customer_Name, User_Name) VALUES
+('John Doe', 'bear'),
+('Jane Smith', 'tiger'),
+('Mike Johnson', 'giraffe'),
+('Emily Davis', 'panda'),
+('Chris Anderson', 'kangaroo');
+
+-- Insert into FlightTicket Table
+
+INSERT INTO FlightTicket (
+    Ticket_ID, User_Name, Purchase_Time_Date, Booking_Fee, Total_Fare,
+    First_Name, Last_Name, ID_Number, Class, Stops,
+    Departure_Airport_ID, Arrival_Airport_ID, Departure_Date_Time, Arrival_Date_Time,
+    Seat_Number, Travel_Type, Flight_Number, Airline_ID, Changeable, Flight_Details
+) VALUES
+(
+    1, 'bear', '2023-12-01 09:15:00', 20, 300,
+    'John', 'Doe', 1, 'Economy', 0,
+    'EWR', 'LGA', '2023-12-01 08:00:00', '2023-12-01 09:00:00',
+    'A01', 'One-way', 1001, 'AA', FALSE,
+    'AA Flight 1001 from Newark (EWR) to LaGuardia (LGA) on 2023-12-01 at 08:00:00, Seat A01 (Direct)'
+),
+(
+    2, 'tiger', '2023-12-02 10:30:00', 25, 400,
+    'Jane', 'Smith', 2, 'Business', 0,
+    'LGA', 'JFK', '2023-12-02 09:00:00', '2023-12-02 10:00:00',
+    'B02', 'Round-trip', 1002, 'UA', TRUE,
+    'UA Flight 1002 from LaGuardia (LGA) to JFK on 2023-12-02 at 09:00:00, Seat B02 (Direct); Return: UA Flight 1002 from JFK to LaGuardia (LGA) on 2023-12-02 at 10:00:00, Seat B02 (Direct)'
+),
+(
+    3, 'giraffe', '2023-12-03 11:45:00', 30, 500,
+    'Mike', 'Johnson', 3, 'First', 0,
+    'JFK', 'EWR', '2023-12-03 10:00:00', '2023-12-03 11:00:00',
+    'C03', 'One-way', 1003, 'DL', TRUE,
+    'DL Flight 1003 from JFK to Newark (EWR) on 2023-12-03 at 10:00:00, Seat C03 (Direct)'
+),
+(
+    4, 'panda', '2023-12-04 13:00:00', 35, 600,
+    'Emily', 'Davis', 4, 'Economy', 1,
+    'ATL', 'ORD', '2023-12-04 11:00:00', '2023-12-04 12:00:00',
+    'D04', 'Round-trip', 1004, 'SW', FALSE,
+    'SW Flight 1004 from Atlanta (ATL) to O Hare (ORD) on 2023-12-04 at 11:00:00, Seat D04 (1 Stop at LaGuardia - LGA); Return: SW Flight 1004 from O Hare (ORD) to Atlanta (ATL) on 2023-12-04 at 12:00:00, Seat D04 (1 Stop at LaGuardia - LGA)'
+),
+(
+    5, 'kangaroo', '2023-12-05 14:15:00', 40, 700,
+    'Chris', 'Anderson', 5, 'Business', 0,
+    'ORD', 'DFW', '2023-12-05 12:00:00', '2023-12-05 13:00:00',
+    'E05', 'One-way', 1005, 'JB', TRUE,
+    'JB Flight 1005 from O Hare (ORD) to Dallas/Fort Worth (DFW) on 2023-12-05 at 12:00:00, Seat E05 (Direct)'
+);
+
+
+-- Insert into Reserves Table
+INSERT INTO Reserves (Airline_ID,Ticket_ID, Seat_Number, Flight_Number) VALUES
+('AA',1, 'A01', 1001),
+('UA',2, 'B02', 1002),
+('DL',3, 'C03', 1003),
+('SW',4, 'D04', 1004),
+('JB',5, 'E05', 1005);
+
+
+
+
+
+
+
+
+
+
+
+SHOW TABLES;
+
